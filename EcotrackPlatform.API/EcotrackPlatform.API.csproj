@@ -17,4 +17,10 @@
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="9.0.6" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Shared\Application\" />
+      <Folder Include="Shared\Domain\Model\Events\" />
+      <Folder Include="Shared\Domain\Model\ValueObjects\" />
+    </ItemGroup>
+
 </Project>
