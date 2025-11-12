@@ -20,7 +20,6 @@
 
     <ItemGroup>
       <Folder Include="Shared\Application\" />
-      <Folder Include="Shared\Domain\Model\Events\" />
       <Folder Include="Shared\Domain\Model\ValueObjects\" />
     </ItemGroup>
 
