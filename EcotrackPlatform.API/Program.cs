@@ -73,11 +73,14 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 //Monitoring And Control Bounded Context
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<IChecklistRepository, ChecklistRepository>();
+builder.Services.AddScoped<ILogbookRepository,  LogbookRepository>();
 builder.Services.AddScoped<CreateTaskCommandService>();
 builder.Services.AddScoped<CreateChecklistCommandService>();
 builder.Services.AddScoped<UpdateTaskStatusCommandService>();
 builder.Services.AddScoped<GetTasksQueryService>();
 builder.Services.AddScoped<GetChecklistByTaskIdQueryService>();
+builder.Services.AddScoped<CreateLogbookCommandService>();
+builder.Services.AddScoped<GetLogbookQueryService>();
 
 
 var app = builder.Build();

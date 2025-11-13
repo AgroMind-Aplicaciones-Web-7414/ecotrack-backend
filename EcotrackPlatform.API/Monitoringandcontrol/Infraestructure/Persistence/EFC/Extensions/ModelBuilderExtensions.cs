@@ -10,5 +10,6 @@ public static class ModelBuilderExtensions
       modelBuilder.ApplyConfiguration(new TaskConfiguration());
       modelBuilder.ApplyConfiguration(new ChecklistConfiguration());
       modelBuilder.ApplyConfiguration(new ChecklistItemConfiguration());
+      modelBuilder.ApplyConfiguration(new LogbookConfiguration());
    } 
 }
