@@ -87,6 +87,12 @@ builder.Services.AddScoped<GetChecklistByTaskIdQueryService>();
 builder.Services.AddScoped<CreateLogbookCommandService>();
 builder.Services.AddScoped<GetLogbookQueryService>();
 
+//Report Bounded Context
+builder.Services.AddScoped<EcotrackPlatform.API.Report.Domain.Repositories.IReportRepository, EcotrackPlatform.API.Report.Infrastructure.Persistence.EFC.Repositories.ReportRepository>();
+builder.Services.AddScoped<EcotrackPlatform.API.Report.Domain.Services.ITaskReportGeneratorService, EcotrackPlatform.API.Report.Infrastructure.Services.TaskReportGeneratorService>();
+builder.Services.AddScoped<EcotrackPlatform.API.Report.Application.Internal.CommandServices.ReportCommandService>();
+builder.Services.AddScoped<EcotrackPlatform.API.Report.Application.Internal.QueryServices.ReportQueryService>();
+
 
 var app = builder.Build();
 
