@@ -1,3 +1,7 @@
+using EcotrackPlatform.API.Monitoringandcontrol.Application.Internal.CommandServices;
+using EcotrackPlatform.API.Monitoringandcontrol.Application.Internal.QueryServices;
+using EcotrackPlatform.API.Monitoringandcontrol.Domain.Repositories;
+using EcotrackPlatform.API.Monitoringandcontrol.Infraestructure.Persistence.EFC.Respositories;
 using EcotrackPlatform.API.Shared.Domain.Repositories;
 using EcotrackPlatform.API.Shared.Infrastructure.Interfaces.ASP.Configuration;
 using EcotrackPlatform.API.Shared.Infrastructure.Persistence.EFC.Configuration;
@@ -66,7 +70,22 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+//Dependency Injection
+
+//Shared Bounded Context
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+//Monitoring And Control Bounded Context
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<IChecklistRepository, ChecklistRepository>();
+builder.Services.AddScoped<ILogbookRepository,  LogbookRepository>();
+builder.Services.AddScoped<CreateTaskCommandService>();
+builder.Services.AddScoped<CreateChecklistCommandService>();
+builder.Services.AddScoped<UpdateTaskStatusCommandService>();
+builder.Services.AddScoped<GetTasksQueryService>();
+builder.Services.AddScoped<GetChecklistByTaskIdQueryService>();
+builder.Services.AddScoped<CreateLogbookCommandService>();
+builder.Services.AddScoped<GetLogbookQueryService>();
 
 
 var app = builder.Build();

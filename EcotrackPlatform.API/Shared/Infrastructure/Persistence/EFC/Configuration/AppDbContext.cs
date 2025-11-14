@@ -3,13 +3,23 @@ using EntityFrameworkCore.CreatedUpdatedDate.Extensions;
 using Microsoft.EntityFrameworkCore;
 using EcotrackPlatform.API.Profile.Infrastructure.Persistence.EFC.Configuration.Extensions; // AddProfileModule
 
-namespace EcotrackPlatform.API.Shared.Infrastructure.Persistence.EFC.Configuration
+using EcotrackPlatform.API.Monitoringandcontrol.Domain.Model.Aggregates;
+using EcotrackPlatform.API.Monitoringandcontrol.Domain.Model.Entities;
+using EcotrackPlatform.API.Monitoringandcontrol.Infraestructure.Persistence.EFC.Extensions;
+
+namespace EcotrackPlatform.API.Shared.Infrastructure.Persistence.EFC.Configuration;
+
+public class AppDbContext(DbContextOptions options) : DbContext(options)
 {
-    public class AppDbContext : DbContext
+    public DbSet<TaskAggregate> Tasks { get; set; }
+    public DbSet<Checklist> Checklists { get; set; }
+    public DbSet<ChecklistItem> ChecklistItems { get; set; }
+    protected override void OnConfiguring(DbContextOptionsBuilder builder)
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-        {
-        }
+        // Automatically set CreatedDate and UpdatedDate for entities
+        builder.AddCreatedUpdatedInterceptor();
+        base.OnConfiguring(builder);
+    }
 
         // --- DbSets mínimos (ajusta con tus entidades reales) ---
         public DbSet<EcotrackPlatform.API.Profile.Domain.Model.Aggregates.Profile> Profiles => Set<EcotrackPlatform.API.Profile.Domain.Model.Aggregates.Profile>();
@@ -18,22 +28,17 @@ namespace EcotrackPlatform.API.Shared.Infrastructure.Persistence.EFC.Configurati
         // Si ya tienes AuthSession en Iam, puedes exponerlo:
         public DbSet<EcotrackPlatform.API.Iam.Domain.Model.Aggregates.AuthSession> AuthSessions => Set<EcotrackPlatform.API.Iam.Domain.Model.Aggregates.AuthSession>();
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(builder);
 
             // Módulos por bounded context
-            modelBuilder.AddProfileModule();
+            builder.AddProfileModule();
+            // Apply naming convention to use snake_case for database objects
+            builder.ApplyConfigurations();
+            builder.Entity<TaskAggregate>().ToTable("Tasks");
+            builder.Entity<Checklist>().ToTable("Checklists");
+            builder.Entity<ChecklistItem>().ToTable("ChecklistItems");
 
-            // Si tienes más módulos/convenciones globales, agrégalas aquí:
-            // modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-            // Model-wide defaults (opcional)
-            // foreach (var prop in modelBuilder.Model.GetEntityTypes()
-            //          .SelectMany(t => t.GetProperties())
-            //          .Where(p => p.ClrType == typeof(string)))
-            // {
-            //     prop.SetMaxLength(255);
-            // }
         }
     }
-}
