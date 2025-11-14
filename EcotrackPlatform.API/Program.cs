@@ -22,13 +22,13 @@ builder.Services.AddControllers(options =>
 
 // Add Database Connection
 var host = Environment.GetEnvironmentVariable("ECOTRACK_DB_HOST");
-var port = Environment.GetEnvironmentVariable("ECOTRACK_DB_PORT");
+var dbPort = Environment.GetEnvironmentVariable("ECOTRACK_DB_PORT");
 var db_ecotrack = Environment.GetEnvironmentVariable("ECOTRACK_DB_NAME");
 var user = Environment.GetEnvironmentVariable("ECOTRACK_DB_USER");
 var pass = Environment.GetEnvironmentVariable("ECOTRACK_DB_PASSWORD");
 
 var connectionString =
-    $"Server={host};Port={port};Database={db_ecotrack};User Id={user};Password={pass};SslMode=Preferred;AllowPublicKeyRetrieval=True;Pooling=True;";
+    $"Server={host};Port={dbPort};Database={db_ecotrack};User Id={user};Password={pass};SslMode=Preferred;AllowPublicKeyRetrieval=True;Pooling=True;";
 
 // Add CORS Policy
 builder.Services.AddCors(options =>
@@ -103,7 +103,12 @@ using (var scope = app.Services.CreateScope())
     var context = services.GetRequiredService<AppDbContext>();
     context.Database.EnsureCreated();
 }
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(int.Parse(port));
+});
 // Enable Swagger
 app.UseSwagger();
 app.UseSwaggerUI();
