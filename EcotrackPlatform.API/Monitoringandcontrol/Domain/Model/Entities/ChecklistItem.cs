@@ -1,5 +1,7 @@
 namespace EcotrackPlatform.API.Monitoringandcontrol.Domain.Model.Entities;
 
+using System;
+
 public class ChecklistItem
 {
     public int Id { get; private set; }

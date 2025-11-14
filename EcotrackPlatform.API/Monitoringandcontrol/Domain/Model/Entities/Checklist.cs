@@ -1,5 +1,6 @@
 namespace EcotrackPlatform.API.Monitoringandcontrol.Domain.Model.Entities;
 
+using System;
 using System.Collections.Generic;
 
 public class Checklist
