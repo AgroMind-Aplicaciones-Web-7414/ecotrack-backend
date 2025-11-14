@@ -7,8 +7,15 @@ using EcotrackPlatform.API.Shared.Infrastructure.Persistence.EFC.Configuration;
 var builder = WebApplication.CreateBuilder(args);
 
 // --- Database (MySQL: Oracle provider) ---
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                       ?? "server=localhost;port=3306;database=ecotrack;user=root;password=changeme;";
+var host = Environment.GetEnvironmentVariable("ECOTRACK_DB_HOST") ;
+var port = Environment.GetEnvironmentVariable("ECOTRACK_DB_PORT") ;
+var db_ecotrack = Environment.GetEnvironmentVariable("ECOTRACK_DB_NAME") ;
+var user = Environment.GetEnvironmentVariable("ECOTRACK_DB_USER") ;
+var pass = Environment.GetEnvironmentVariable("ECOTRACK_DB_PASSWORD") ;
+
+var connectionString =
+    $"Server={host};Port={port};Database={db_ecotrack};User Id={user};Password={pass};SslMode=Preferred;AllowPublicKeyRetrieval=True;Pooling=True;";
+
 
 // OJO: con Oracle se usa UseMySQL (no ServerVersion)
 builder.Services.AddDbContext<AppDbContext>(options =>
