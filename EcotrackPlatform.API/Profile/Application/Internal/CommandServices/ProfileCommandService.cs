@@ -25,13 +25,16 @@ namespace EcotrackPlatform.API.Profile.Application.Internal.CommandServices
             var existing = await _profiles.FindByEmailAsync(email);
             if (existing is not null) throw new InvalidOperationException("Email already in use.");
 
-            var tmp = new ProfileAgg(email, displayName, ""); // se setea hash abajo
-            var hash = _hasher.HashPassword(tmp, plainPassword);
-            tmp.SetPasswordHash(hash);
+            // Generamos el hash de la contraseña antes de crear el perfil
+            var hash = _hasher.HashPassword(null, plainPassword); // Generamos el hash de la contraseña
 
-            await _profiles.AddAsync(tmp);
+            // Ahora creamos el perfil pasando el hash generado
+            var profile = new ProfileAgg(email, displayName, hash); // Le pasamos el passwordHash correctamente
+
+            // Añadimos el perfil a la base de datos
+            await _profiles.AddAsync(profile);
             await _uow.CompleteAsync();
-            return tmp;
+            return profile;
         }
 
         public async Task<ProfileAgg?> UpdateAsync(int id, string? displayName = null, string? email = null)
@@ -73,7 +76,7 @@ namespace EcotrackPlatform.API.Profile.Application.Internal.CommandServices
             if (result == PasswordVerificationResult.Failed) return false;
 
             var newHash = _hasher.HashPassword(entity, newPassword);
-            entity.SetPasswordHash(newHash);
+            entity.SetPasswordHash(newHash); // Establecemos el nuevo hash
             _profiles.Update(entity);
             await _uow.CompleteAsync();
             return true;

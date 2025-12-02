@@ -1,7 +1,14 @@
+using EcotrackPlatform.API.Iam.Application.Internal.CommandServices;
+using EcotrackPlatform.API.Iam.Domain.Repositories;
+using EcotrackPlatform.API.Iam.Infrastructure.Repositories;
 using EcotrackPlatform.API.Monitoringandcontrol.Application.Internal.CommandServices;
 using EcotrackPlatform.API.Monitoringandcontrol.Application.Internal.QueryServices;
 using EcotrackPlatform.API.Monitoringandcontrol.Domain.Repositories;
 using EcotrackPlatform.API.Monitoringandcontrol.Infraestructure.Persistence.EFC.Respositories;
+using EcotrackPlatform.API.Profile.Application.Internal.CommandServices;
+using EcotrackPlatform.API.Profile.Application.Internal.QueryServices;
+using EcotrackPlatform.API.Profile.Domain.Repositories;
+using EcotrackPlatform.API.Profile.Infrastructure.Repositories;
 using EcotrackPlatform.API.Shared.Domain.Repositories;
 using EcotrackPlatform.API.Shared.Infrastructure.Interfaces.ASP.Configuration;
 using EcotrackPlatform.API.Shared.Infrastructure.Persistence.EFC.Configuration;
@@ -21,14 +28,7 @@ builder.Services.AddControllers(options =>
 });
 
 // Add Database Connection
-var host = Environment.GetEnvironmentVariable("ECOTRACK_DB_HOST");
-var port = Environment.GetEnvironmentVariable("ECOTRACK_DB_PORT");
-var db_ecotrack = Environment.GetEnvironmentVariable("ECOTRACK_DB_NAME");
-var user = Environment.GetEnvironmentVariable("ECOTRACK_DB_USER");
-var pass = Environment.GetEnvironmentVariable("ECOTRACK_DB_PASSWORD");
-
-var connectionString =
-    $"Server={host};Port={port};Database={db_ecotrack};User Id={user};Password={pass};SslMode=Preferred;AllowPublicKeyRetrieval=True;Pooling=True;";
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // Add CORS Policy
 builder.Services.AddCors(options =>
@@ -92,6 +92,21 @@ builder.Services.AddScoped<EcotrackPlatform.API.Report.Domain.Repositories.IRepo
 builder.Services.AddScoped<EcotrackPlatform.API.Report.Domain.Services.ITaskReportGeneratorService, EcotrackPlatform.API.Report.Infrastructure.Services.TaskReportGeneratorService>();
 builder.Services.AddScoped<EcotrackPlatform.API.Report.Application.Internal.CommandServices.ReportCommandService>();
 builder.Services.AddScoped<EcotrackPlatform.API.Report.Application.Internal.QueryServices.ReportQueryService>();
+
+// IAM Bounded Context
+builder.Services.AddScoped<AuthCommandService>();
+builder.Services.AddScoped<IAuthSessionRepository, AuthSessionRepository>();
+builder.Services.AddScoped<IProfileRepository, ProfileRepository>();  // Si aún no está registrado
+
+
+builder.Services.AddScoped<ProfileQueryService>();
+builder.Services.AddScoped<ProfileCommandService>();
+builder.Services.AddScoped<IProfileSettingsRepository, ProfileSettingsRepository>(); 
+builder.Services.AddScoped<SettingsQueryService>();  // Agrega esta línea
+builder.Services.AddScoped<SettingsCommandService>();  // Registra el servicio SettingsCommandService
+
+
+
 
 
 var app = builder.Build();

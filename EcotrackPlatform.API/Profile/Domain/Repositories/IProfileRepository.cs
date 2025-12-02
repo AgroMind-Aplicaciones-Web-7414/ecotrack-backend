@@ -12,5 +12,7 @@ namespace EcotrackPlatform.API.Profile.Domain.Repositories
         Task AddAsync(ProfileAgg profile);
         void Update(ProfileAgg profile);
         void Remove(ProfileAgg profile);
+        
+        
     }
 }
