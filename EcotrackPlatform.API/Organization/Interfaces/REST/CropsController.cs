@@ -62,4 +62,12 @@ public class CropsController : ControllerBase
         var resources = crops.Select(CropResourceFromEntityAssembler.ToResource);
         return Ok(resources);
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var deleted = await _commandService.Handle(id);
+        if (!deleted) return NotFound();
+        return NoContent();
+    }
 }

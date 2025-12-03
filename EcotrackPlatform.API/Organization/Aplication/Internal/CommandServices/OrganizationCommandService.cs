@@ -21,4 +21,14 @@ public class OrganizationCommandService(IOrganizationRepository repository, IUni
 
         return org;
     }
+
+    public async Task<bool> Handle(int id)
+    {
+        var organization = await repository.FindByIdAsync(id);
+        if (organization == null) return false;
+
+        repository.Remove(organization);
+        await unitOfWork.CompleteAsync();
+        return true;
+    }
 }

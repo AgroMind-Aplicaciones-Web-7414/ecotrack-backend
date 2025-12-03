@@ -26,4 +26,14 @@ public class CropCommandService(
 
         return crop;
     }
+
+    public async Task<bool> Handle(int id)
+    {
+        var crop = await cropRepository.FindByIdAsync(id);
+        if (crop == null) return false;
+
+        cropRepository.Remove(crop);
+        await unitOfWork.CompleteAsync();
+        return true;
+    }
 }

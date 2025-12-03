@@ -51,4 +51,12 @@ public class OrganizationsController : ControllerBase
         var resource = OrganizationResourceFromEntityAssembler.ToResource(organization);
         return Ok(resource);
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var deleted = await _commandService.Handle(id);
+        if (!deleted) return NotFound();
+        return NoContent();
+    }
 }
