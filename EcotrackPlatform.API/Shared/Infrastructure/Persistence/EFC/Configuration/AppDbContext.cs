@@ -1,4 +1,6 @@
-﻿﻿using EntityFrameworkCore.CreatedUpdatedDate.Extensions;
+﻿using EcotrackPlatform.API.Organization.Domain.Model.Aggregates;
+using EcotrackPlatform.API.Shared.Infrastructure.Persistence.EFC.Configuration.Extensions;
+using EntityFrameworkCore.CreatedUpdatedDate.Extensions;
 using Microsoft.EntityFrameworkCore;
 using EcotrackPlatform.API.Profile.Infrastructure.Persistence.EFC.Configuration.Extensions;
 using EcotrackPlatform.API.Shared.Infrastructure.Persistence.EFC.Configuration.Extensions;
@@ -7,6 +9,7 @@ using EcotrackPlatform.API.Monitoringandcontrol.Domain.Model.Aggregates;
 using EcotrackPlatform.API.Monitoringandcontrol.Domain.Model.Entities;
 using MonitoringExtensions = EcotrackPlatform.API.Monitoringandcontrol.Infraestructure.Persistence.EFC.Extensions.ModelBuilderExtensions;
 using EcotrackPlatform.API.Report.Infrastructure.Persistence.EFC.Configuration.Extensions;
+using EntityFrameworkCore.CreatedUpdatedDate.Extensions;
 
 namespace EcotrackPlatform.API.Shared.Infrastructure.Persistence.EFC.Configuration;
 
@@ -16,7 +19,9 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<Checklist> Checklists { get; set; }
     public DbSet<ChecklistItem> ChecklistItems { get; set; }
     public DbSet<Logbook> Logbooks { get; set; }
-    
+    public DbSet<Organization.Domain.Model.Aggregates.Organization> Organizations { get; set; }
+    public DbSet<Crop> Crops { get; set; }
+
     // Report Module
     public DbSet<EcotrackPlatform.API.Report.Domain.Model.Report> Reports { get; set; }
     
