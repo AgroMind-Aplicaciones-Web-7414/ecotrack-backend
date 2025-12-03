@@ -147,8 +147,10 @@ app.UseSwaggerUI();
 app.UseCors("AllowAllPolicy");
 
 // HTTPS Redirection
-app.UseHttpsRedirection();
-
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 // Map controllers
 app.MapControllers();
 
