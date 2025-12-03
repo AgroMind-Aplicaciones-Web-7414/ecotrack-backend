@@ -25,6 +25,12 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddControllers(options =>
 {
     options.Conventions.Add(new KebabCaseRouteNamingConvention());
+    options.RespectBrowserAcceptHeader = true;
+})
+.AddXmlSerializerFormatters()
+.ConfigureApiBehaviorOptions(options =>
+{
+    options.SuppressConsumesConstraintForFormFileParameters = true;
 });
 
 // Add Database Connection
@@ -96,10 +102,8 @@ builder.Services.AddScoped<CreateLogbookCommandService>();
 builder.Services.AddScoped<GetLogbookQueryService>();
 
 //Report Bounded Context
-builder.Services.AddScoped<EcotrackPlatform.API.Report.Domain.Repositories.IReportRepository, EcotrackPlatform.API.Report.Infrastructure.Persistence.EFC.Repositories.ReportRepository>();
-builder.Services.AddScoped<EcotrackPlatform.API.Report.Domain.Services.ITaskReportGeneratorService, EcotrackPlatform.API.Report.Infrastructure.Services.TaskReportGeneratorService>();
-builder.Services.AddScoped<EcotrackPlatform.API.Report.Application.Internal.CommandServices.ReportCommandService>();
 builder.Services.AddScoped<EcotrackPlatform.API.Report.Application.Internal.QueryServices.ReportQueryService>();
+builder.Services.AddScoped<EcotrackPlatform.API.Report.Infrastructure.Services.PdfReportGeneratorService>();
 
 builder.Services.AddScoped<EcotrackPlatform.API.Organization.Domain.Repositories.IOrganizationRepository, 
     EcotrackPlatform.API.Organization.Infrastructure.Repositories.OrganizationRepository>();

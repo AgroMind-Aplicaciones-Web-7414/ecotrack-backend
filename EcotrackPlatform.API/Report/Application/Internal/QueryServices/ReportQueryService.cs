@@ -1,113 +1,74 @@
 ﻿namespace EcotrackPlatform.API.Report.Application.Internal.QueryServices;
 
-using System.Text;
-using System.Text.Json;
-using EcotrackPlatform.API.Report.Application.Internal.DTOs;
-using EcotrackPlatform.API.Report.Domain.Repositories;
+using EcotrackPlatform.API.Monitoringandcontrol.Domain.Repositories;
+using EcotrackPlatform.API.Monitoringandcontrol.Domain.Model.ValueObjects;
+using EcotrackPlatform.API.Report.Infrastructure.Services;
 
 public class ReportQueryService
 {
-    private readonly IReportRepository _reportRepository;
+    private readonly ITaskRepository _taskRepository;
+    private readonly PdfReportGeneratorService _pdfGenerator;
 
-    public ReportQueryService(IReportRepository reportRepository)
+    public ReportQueryService(ITaskRepository taskRepository, PdfReportGeneratorService pdfGenerator)
     {
-        _reportRepository = reportRepository;
+        _taskRepository = taskRepository;
+        _pdfGenerator = pdfGenerator;
     }
 
     /// <summary>
-    /// Obtiene un reporte por ID con su metadata y contenido decodificado como JSON
+    /// Genera un reporte en tiempo real del estado de todas las tareas
     /// </summary>
-    public async Task<ReportDetailDto?> GetReportByIdAsync(int reportId)
+    public async Task<object> GenerateTasksReportAsync()
     {
-        var report = await _reportRepository.FindByIdAsync(reportId);
-        
-        if (report == null)
-        {
-            return null;
-        }
+        // Obtener todas las tareas del repositorio
+        var allTasks = await _taskRepository.GetAllAsync();
 
-        // Crear el DTO con la metadata del reporte
-        var dto = new ReportDetailDto
+        // Calcular estadísticas
+        var totalTasks = allTasks.Count;
+        var completedTasks = allTasks.Count(t => t.Status == TaskStatus.Completed);
+        var pendingTasks = allTasks.Count(t => t.Status == TaskStatus.Pending);
+        var inProgressTasks = allTasks.Count(t => t.Status == TaskStatus.InProgress);
+
+        // Crear la estructura del reporte con datos reales
+        var report = new
         {
-            Id = report.Id,
-            ReportId = report.ReportId.Value,
-            RequestedBy = report.RequestedBy.Value,
-            Status = report.Status.ToString(),
-            PlotId = report.PlotId.Value,
-            Type = report.Type.ToString(),
-            PeriodStart = report.PeriodStart,
-            PeriodEnd = report.PeriodEnd,
-            GeneratedAt = report.GeneratedAt,
-            CreatedAt = report.CreatedAt,
-            UpdatedAt = report.UpdatedAt,
-            FailureReason = report.FailureReason
+            GeneratedAt = DateTime.UtcNow,
+            Summary = new
+            {
+                TotalTasks = totalTasks,
+                CompletedTasks = completedTasks,
+                PendingTasks = pendingTasks,
+                InProgressTasks = inProgressTasks,
+                CompletionRate = totalTasks > 0 ? Math.Round((double)completedTasks / totalTasks * 100, 2) : 0
+            },
+            Tasks = allTasks.Select(t => new
+            {
+                Id = t.Id,
+                Title = t.Title,
+                ResponsibleId = t.ResponsibleId,
+                Status = t.Status.ToString(),
+                StartedAt = t.StartedAt,
+                CompletedAt = t.CompletedAt,
+                CreatedAt = t.CreatedAt,
+                UpdatedAt = t.UpdatedAt
+            }).OrderByDescending(t => t.CreatedAt).ToList()
         };
 
-        // Decodificar el contenido si existe
-        if (report.Content != null && report.Content.Length > 0)
-        {
-            try
-            {
-                // Convertir byte[] a string usando UTF-8
-                var jsonString = Encoding.UTF8.GetString((byte[])report.Content);
-                
-                // Parsear el JSON a JsonDocument
-                dto.Content = JsonDocument.Parse(jsonString);
-            }
-            catch (JsonException)
-            {
-                // Si hay error al parsear, dejar Content como null
-                dto.Content = null;
-            }
-        }
-
-        return dto;
+        return await Task.FromResult(report);
     }
 
     /// <summary>
-    /// Obtiene todos los reportes de un perfil específico
+    /// Genera un reporte en formato PDF del estado de todas las tareas
     /// </summary>
-    public async Task<IEnumerable<ReportDetailDto>> GetReportsByProfileIdAsync(int profileId)
+    public async Task<byte[]> GenerateTasksReportPdfAsync()
     {
-        var reports = await _reportRepository.FindByRequestedByAsync(profileId);
-        var dtoList = new List<ReportDetailDto>();
-
-        foreach (var report in reports)
-        {
-            var dto = new ReportDetailDto
-            {
-                Id = report.Id,
-                ReportId = report.ReportId.Value,
-                RequestedBy = report.RequestedBy.Value,
-                Status = report.Status.ToString(),
-                PlotId = report.PlotId.Value,
-                Type = report.Type.ToString(),
-                PeriodStart = report.PeriodStart,
-                PeriodEnd = report.PeriodEnd,
-                GeneratedAt = report.GeneratedAt,
-                CreatedAt = report.CreatedAt,
-                UpdatedAt = report.UpdatedAt,
-                FailureReason = report.FailureReason
-            };
-
-            // Decodificar contenido si existe
-            if (report.Content != null && report.Content.Length > 0)
-            {
-                try
-                {
-                    var jsonString = Encoding.UTF8.GetString(report.Content);
-                    dto.Content = JsonDocument.Parse(jsonString);
-                }
-                catch (JsonException)
-                {
-                    dto.Content = null;
-                }
-            }
-
-            dtoList.Add(dto);
-        }
-
-        return dtoList;
+        // Obtener el reporte en formato JSON
+        var reportData = await GenerateTasksReportAsync();
+        
+        // Generar el PDF usando el servicio
+        var pdfBytes = _pdfGenerator.GenerateTasksReportPdf(reportData);
+        
+        return pdfBytes;
     }
 }
 
