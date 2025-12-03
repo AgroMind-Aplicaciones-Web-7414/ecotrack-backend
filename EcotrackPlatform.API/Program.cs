@@ -1,7 +1,14 @@
+using EcotrackPlatform.API.Iam.Application.Internal.CommandServices;
+using EcotrackPlatform.API.Iam.Domain.Repositories;
+using EcotrackPlatform.API.Iam.Infrastructure.Repositories;
 using EcotrackPlatform.API.Monitoringandcontrol.Application.Internal.CommandServices;
 using EcotrackPlatform.API.Monitoringandcontrol.Application.Internal.QueryServices;
 using EcotrackPlatform.API.Monitoringandcontrol.Domain.Repositories;
 using EcotrackPlatform.API.Monitoringandcontrol.Infraestructure.Persistence.EFC.Respositories;
+using EcotrackPlatform.API.Profile.Application.Internal.CommandServices;
+using EcotrackPlatform.API.Profile.Application.Internal.QueryServices;
+using EcotrackPlatform.API.Profile.Domain.Repositories;
+using EcotrackPlatform.API.Profile.Infrastructure.Repositories;
 using EcotrackPlatform.API.Shared.Domain.Repositories;
 using EcotrackPlatform.API.Shared.Infrastructure.Interfaces.ASP.Configuration;
 using EcotrackPlatform.API.Shared.Infrastructure.Persistence.EFC.Configuration;
@@ -21,6 +28,7 @@ builder.Services.AddControllers(options =>
 });
 
 // Add Database Connection
+
 var host = Environment.GetEnvironmentVariable("ECOTRACK_DB_HOST");
 var port = Environment.GetEnvironmentVariable("ECOTRACK_DB_PORT");
 var db_ecotrack = Environment.GetEnvironmentVariable("ECOTRACK_DB_NAME");
@@ -107,6 +115,19 @@ builder.Services.AddScoped<EcotrackPlatform.API.Organization.Aplication.Services
     EcotrackPlatform.API.Organization.Aplication.Internal.CommandServices.CropCommandService>();
 builder.Services.AddScoped<EcotrackPlatform.API.Organization.Aplication.Services.ICropQueryService, 
     EcotrackPlatform.API.Organization.Aplication.Internal.QueryServices.CropQueryService>();
+
+// IAM Bounded Context
+builder.Services.AddScoped<AuthCommandService>();
+builder.Services.AddScoped<IAuthSessionRepository, AuthSessionRepository>();
+builder.Services.AddScoped<IProfileRepository, ProfileRepository>();  // Si aún no está registrado
+
+
+builder.Services.AddScoped<ProfileQueryService>();
+builder.Services.AddScoped<ProfileCommandService>();
+builder.Services.AddScoped<IProfileSettingsRepository, ProfileSettingsRepository>(); 
+builder.Services.AddScoped<SettingsQueryService>();  // Agrega esta línea
+builder.Services.AddScoped<SettingsCommandService>();  // Registra el servicio SettingsCommandService
+
 
 var app = builder.Build();
 

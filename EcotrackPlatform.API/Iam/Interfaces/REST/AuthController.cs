@@ -12,6 +12,22 @@ public class AuthController : ControllerBase
 
     public AuthController(AuthCommandService auth) { _auth = auth; }
 
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterResource body)
+    {
+        var profile = await _auth.RegisterAsync(body.Email, body.Password, body.DisplayName);
+        
+        if (profile is null) 
+            return BadRequest(new { message = "Email already in use or invalid data. Password must be at least 6 characters." });
+
+        return Ok(new { 
+            message = "Registration successful. You can now log in.",
+            userId = profile.Id,
+            email = profile.Email,
+            displayName = profile.DisplayName
+        });
+    }
+
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginResource body)
     {

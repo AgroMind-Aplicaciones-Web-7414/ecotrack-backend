@@ -29,6 +29,30 @@ namespace EcotrackPlatform.API.Iam.Application.Internal.CommandServices
             _profiles = profiles; _sessions = sessions; _uow = uow; _config = config;
         }
 
+        public async Task<ProfileAgg?> RegisterAsync(string email, string password, string displayName)
+        {
+            // Validar que el email no esté en uso
+            var existingUser = await _profiles.FindByEmailAsync(email);
+            if (existingUser is not null) return null; // Email ya registrado
+
+            // Validaciones básicas
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(displayName))
+                return null;
+
+            if (password.Length < 6) return null; // Password muy corto
+
+            // Hashear la contraseña
+            var tempProfile = new ProfileAgg(email, displayName, "temp");
+            var passwordHash = _hasher.HashPassword(tempProfile, password);
+
+            // Crear el perfil con el hash real
+            var profile = new ProfileAgg(email, displayName, passwordHash);
+            await _profiles.AddAsync(profile);
+            await _uow.CompleteAsync();
+            
+            return profile;
+        }
+
         public async Task<AuthSession?> LoginAsync(string email, string password, string? ua, string? ip)
         {
             var user = await _profiles.FindByEmailAsync(email);
