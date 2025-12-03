@@ -1,6 +1,4 @@
 ﻿namespace EcotrackPlatform.API.Organization.Domain.Model.Queries;
 
-public class GetOrganizationByIdQuery
-{
-    
-}
+public record GetOrganizationByIdQuery(int Id);
+

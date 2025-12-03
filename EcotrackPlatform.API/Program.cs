@@ -63,6 +63,21 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+// Organization Context - Repositories
+builder.Services.AddScoped<EcotrackPlatform.API.Organization.Domain.Repositories.IOrganizationRepository, 
+    EcotrackPlatform.API.Organization.Infrastructure.Repositories.OrganizationRepository>();
+builder.Services.AddScoped<EcotrackPlatform.API.Organization.Domain.Repositories.ICropRepository, 
+    EcotrackPlatform.API.Organization.Infrastructure.Repositories.CropRepository>();
+
+// Organization Context - Services
+builder.Services.AddScoped<EcotrackPlatform.API.Organization.Aplication.Services.IOrganizationCommandService, 
+    EcotrackPlatform.API.Organization.Aplication.Internal.CommandServices.OrganizationCommandService>();
+builder.Services.AddScoped<EcotrackPlatform.API.Organization.Aplication.Services.IOrganizationQueryService, 
+    EcotrackPlatform.API.Organization.Aplication.Internal.QueryServices.OrganizationQueryService>();
+builder.Services.AddScoped<EcotrackPlatform.API.Organization.Aplication.Services.ICropCommandService, 
+    EcotrackPlatform.API.Organization.Aplication.Internal.CommandServices.CropCommandService>();
+builder.Services.AddScoped<EcotrackPlatform.API.Organization.Aplication.Services.ICropQueryService, 
+    EcotrackPlatform.API.Organization.Aplication.Internal.QueryServices.CropQueryService>();
 
 var app = builder.Build();
 
